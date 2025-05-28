@@ -325,7 +325,7 @@ if game.PlaceId == 83363871432855 then
     end)
 
     placeButton.MouseButton1Click:Connect(function()
-    placeButton.Text = "Waiting for click"
+    placeButton.Text = "Click where you want to place(or click this again to place another one)"
     local conn
     conn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 then
