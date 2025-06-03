@@ -2,8 +2,11 @@ if game.PlaceId ~= 117452115137842 and game.PlaceId ~= 83363871432855 then retur
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CoreGui = game:GetService("CoreGui")
 local player = Players.LocalPlayer
+
+local remote = ReplicatedStorage:WaitForChild("ApplyElevatorSettings")
 
 local function createUICorner(parent, radius)
     local corner = Instance.new("UICorner")
@@ -33,7 +36,7 @@ end
 
 local function createButton(text, y, parent, action)
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(1, -30, 0, 30) -- same size as textbox
+    b.Size = UDim2.new(1, -30, 0, 30)
     b.Position = UDim2.new(0, 15, 0, y)
     b.Text = text
     b.TextColor3 = Color3.new(1, 1, 1)
@@ -71,21 +74,55 @@ if game.PlaceId == 117452115137842 then
     title.Parent = frame
 
     local tb1 = createTextbox("Amount of People(any amount)", 46, frame)
-    local btn2 = createButton("Let people in", 86, frame, function()
+
+    local btn2
+    btn2 = createButton("Let people in", 86, frame, function()
         if btn2.Text == "Let people in" then
             btn2.Text = "Don't let people in"
         else
             btn2.Text = "Let people in"
         end
     end)
+
     local tb3 = createTextbox("Mode(can be put as anything)", 126, frame)
     local tb4 = createTextbox("Map(can be put as anything)", 166, frame)
 
+    local spamming = false
+    local spamThread
+
     local btn = createButton("Spam", 210, frame, function()
-        local val1 = tb1.Text
-        local val3 = tb3.Text
-        local val4 = tb4.Text
-        print(val1, val3, val4)
+        if spamming then
+            spamming = false
+            btn.Text = "Spam"
+            if spamThread then
+                task.cancel(spamThread)
+                spamThread = nil
+            end
+            return
+        end
+
+        spamming = true
+        btn.Text = "Stop Spam"
+
+        spamThread = task.spawn(function()
+            local val1 = tb1.Text
+            local val2 = (btn2.Text == "Don't let people in") -- true if "Don't let people in"
+            local val3 = tb3.Text
+            local val4 = tb4.Text
+            local elevatorsFolder = workspace:FindFirstChild("Elevators")
+            if not elevatorsFolder then return end
+
+            while spamming do
+                for _, elevatorModel in ipairs(elevatorsFolder:GetChildren()) do
+                    if elevatorModel:IsA("Model") then
+                        remote:FireServer(val1, val2, val3, val4, elevatorModel)
+                        task.wait()
+                    end
+                    if not spamming then break end
+                end
+                task.wait()
+            end
+        end)
     end)
 
     local dragging, input, start, offset
