@@ -169,6 +169,7 @@ if game.PlaceId == 117452115137842 then
 	title.Parent = frame
 
 	local tb1 = createTextbox("Amount of People", 46, frame)
+
 	local btn2
 	local function toggleBtn2()
 		if btn2 then
@@ -183,7 +184,8 @@ if game.PlaceId == 117452115137842 then
 	local spamming = false
 	local spamThread
 
-	local btn = createButton("Spam", 210, frame, function()
+	local btn
+	btn = createButton("Spam", 210, frame, function()
 		if spamming then
 			spamming = false
 			btn.Text = "Spam"
