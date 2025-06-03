@@ -5,6 +5,7 @@ local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
 local remote = ReplicatedStorage:WaitForChild("ApplyElevatorSettings")
@@ -45,14 +46,17 @@ end
 local function rainbowPulse(obj)
 	local hue = 0
 	local conn
-	conn = game:GetService("RunService").RenderStepped:Connect(function()
+	conn = RunService.RenderStepped:Connect(function()
 		hue = (hue + 1) % 360
-		obj.TextColor3 = Color3.fromHSV(hue/360, 1, 1)
+		obj.TextColor3 = Color3.fromHSV(hue / 360, 1, 1)
 	end)
 	obj.MouseLeave:Connect(function()
-		conn:Disconnect()
-		TweenService:Create(obj, TweenInfo.new(0.2), {TextColor3 = Color3.new(1,1,1)}):Play()
+		-- do nothing on leave, keep rainbow
 	end)
+	obj.MouseEnter:Connect(function()
+		-- keep rainbow on hover
+	end)
+	return conn
 end
 
 local function rippleEffect(button)
@@ -62,17 +66,15 @@ local function rippleEffect(button)
 		ripple.Size = UDim2.new(0, 0, 0, 0)
 		ripple.BackgroundTransparency = 0.5
 		ripple.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-		ripple.Position = UDim2.new(0, button.AbsoluteSize.X/2, 0, button.AbsoluteSize.Y/2)
+		ripple.Position = UDim2.new(0, button.AbsoluteSize.X / 2, 0, button.AbsoluteSize.Y / 2)
 		ripple.AnchorPoint = Vector2.new(0.5, 0.5)
 		ripple.Parent = button
 		createUICorner(ripple, 999)
-
-		TweenService:Create(ripple, TweenInfo.new(0.5), {
-			Size = UDim2.new(2, 0, 2, 0),
+		TweenService:Create(ripple, TweenInfo.new(0.6), {
+			Size = UDim2.new(3, 0, 3, 0),
 			BackgroundTransparency = 1
 		}):Play()
-
-		game.Debris:AddItem(ripple, 0.6)
+		game.Debris:AddItem(ripple, 0.7)
 	end)
 end
 
@@ -91,22 +93,18 @@ local function createTextbox(placeholder, y, parent)
 	setFont(tb)
 	tb.TextSize = 18
 	rainbowPulse(tb)
-
 	tb.Focused:Connect(function()
 		if tb.Text == placeholder then
 			tb.Text = ""
 			tb.TextColor3 = Color3.new(1, 1, 1)
 		end
 	end)
-
 	tb.FocusLost:Connect(function()
 		if tb.Text == "" then
 			tb.Text = placeholder
 			tb.TextColor3 = Color3.fromRGB(180, 180, 180)
-			tb.MouseLeave:Wait()
 		end
 	end)
-
 	return tb
 end
 
@@ -164,6 +162,18 @@ if game.PlaceId == 117452115137842 then
 	frame.Parent = gui
 	createUICorner(frame, 12)
 	createShadow(frame)
+
+	local glow = Instance.new("UIStroke")
+	glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	glow.Color = Color3.fromHSV(0, 1, 1)
+	glow.Thickness = 4
+	glow.Parent = frame
+
+	local hue = 0
+	RunService.RenderStepped:Connect(function()
+		hue = (hue + 1) % 360
+		glow.Color = Color3.fromHSV(hue / 360, 1, 1)
+	end)
 
 	TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
 
@@ -245,12 +255,12 @@ if game.PlaceId == 117452115137842 then
 			ripple.Parent = frame
 			createUICorner(ripple, 12)
 
-			TweenService:Create(ripple, TweenInfo.new(0.5), {
-				Size = UDim2.new(1, 0, 1, 0),
+			TweenService:Create(ripple, TweenInfo.new(0.6), {
+				Size = UDim2.new(3, 0, 3, 0),
 				BackgroundTransparency = 1
 			}):Play()
 
-			game.Debris:AddItem(ripple, 0.6)
+			game.Debris:AddItem(ripple, 0.7)
 
 			i.Changed:Connect(function()
 				if i.UserInputState == Enum.UserInputState.End then
