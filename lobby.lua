@@ -6,6 +6,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local player = Players.LocalPlayer
+
 local remote = ReplicatedStorage:WaitForChild("ApplyElevatorSettings")
 
 local function createUICorner(parent, radius)
@@ -14,62 +15,51 @@ local function createUICorner(parent, radius)
 	corner.Parent = parent
 end
 
+local function createShadow(parent)
+	local shadow = Instance.new("ImageLabel")
+	shadow.Name = "Shadow"
+	shadow.BackgroundTransparency = 1
+	shadow.Image = "rbxassetid://1316045217"
+	shadow.ImageTransparency = 0.5
+	shadow.ScaleType = Enum.ScaleType.Slice
+	shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+	shadow.Size = UDim2.new(1, 10, 1, 10)
+	shadow.Position = UDim2.new(0, -5, 0, -5)
+	shadow.ZIndex = parent.ZIndex - 1
+	shadow.Parent = parent
+end
+
 local function setFont(obj)
 	obj.FontFace = Font.new("rbxasset://fonts/families/PressStart2P.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
 end
 
-local function tweenColor(obj, color, time)
-	local info = TweenInfo.new(time or 0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-	TweenService:Create(obj, info, {BackgroundColor3 = color}):Play()
-end
-
-local function tweenScale(obj, scale, time)
-	local info = TweenInfo.new(time or 0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-	TweenService:Create(obj, info, {Size = obj.Size * scale}):Play()
-end
-
-local function animateButton(btn)
-	local normal = Color3.fromRGB(64, 68, 75)
-	local hover = Color3.fromRGB(80, 85, 95)
-	local down = Color3.fromRGB(50, 54, 60)
-
-	btn.MouseEnter:Connect(function()
-		tweenColor(btn, hover)
-		tweenScale(btn, 1.05)
+local function pulseOnHover(button)
+	button.MouseEnter:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(0, 255, 255)}):Play()
 	end)
-
-	btn.MouseLeave:Connect(function()
-		tweenColor(btn, normal)
-		tweenScale(btn, 1 / 1.05)
-	end)
-
-	btn.MouseButton1Down:Connect(function()
-		tweenColor(btn, down)
-	end)
-
-	btn.MouseButton1Up:Connect(function()
-		tweenColor(btn, btn:IsHovered() and hover or normal)
+	button.MouseLeave:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.2), {TextColor3 = Color3.new(1, 1, 1)}):Play()
 	end)
 end
 
-local function animateTextbox(tb)
-	local normal = Color3.fromRGB(64, 68, 75)
-	local focus = Color3.fromRGB(90, 95, 105)
+local function rippleEffect(button)
+	button.ClipsDescendants = true
+	button.MouseButton1Click:Connect(function(x, y)
+		local ripple = Instance.new("Frame")
+		ripple.Size = UDim2.new(0, 0, 0, 0)
+		ripple.BackgroundTransparency = 0.5
+		ripple.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+		ripple.Position = UDim2.new(0, x - button.AbsolutePosition.X, 0, y - button.AbsolutePosition.Y)
+		ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+		ripple.Parent = button
+		createUICorner(ripple, 999)
 
-	tb.MouseEnter:Connect(function()
-		tweenScale(tb, 1.03)
-	end)
+		TweenService:Create(ripple, TweenInfo.new(0.5), {
+			Size = UDim2.new(1.5, 0, 4, 0),
+			BackgroundTransparency = 1
+		}):Play()
 
-	tb.MouseLeave:Connect(function()
-		tweenScale(tb, 1 / 1.03)
-	end)
-
-	tb.Focused:Connect(function()
-		tweenColor(tb, focus)
-	end)
-
-	tb.FocusLost:Connect(function()
-		tweenColor(tb, normal)
+		game.Debris:AddItem(ripple, 0.6)
 	end)
 end
 
@@ -81,10 +71,13 @@ local function createTextbox(placeholder, y, parent)
 	tb.TextColor3 = Color3.fromRGB(180, 180, 180)
 	tb.BackgroundColor3 = Color3.fromRGB(64, 68, 75)
 	tb.BorderSizePixel = 0
+	tb.ZIndex = 2
 	tb.Parent = parent
 	createUICorner(tb, 6)
+	createShadow(tb)
 	setFont(tb)
 	tb.TextSize = 18
+	pulseOnHover(tb)
 
 	tb.Focused:Connect(function()
 		if tb.Text == placeholder then
@@ -100,7 +93,6 @@ local function createTextbox(placeholder, y, parent)
 		end
 	end)
 
-	animateTextbox(tb)
 	return tb
 end
 
@@ -112,30 +104,31 @@ local function createButton(text, y, parent, action)
 	b.TextColor3 = Color3.new(1, 1, 1)
 	b.BackgroundColor3 = Color3.fromRGB(64, 68, 75)
 	b.BorderSizePixel = 0
+	b.ZIndex = 2
 	b.Parent = parent
 	createUICorner(b, 6)
+	createShadow(b)
 	setFont(b)
 	b.TextSize = 18
 	b.MouseButton1Click:Connect(action)
-	animateButton(b)
+	pulseOnHover(b)
+	rippleEffect(b)
 	return b
 end
 
 if game.PlaceId == 117452115137842 then
-	local elevators = workspace:FindFirstChild("Elevators")
-	if elevators then
-		local names = {}
-		for _, model in ipairs(elevators:GetChildren()) do
-			if model:IsA("Model") then
-				local original = model.Name
-				if names[original] then
-					local unique = original
-					repeat
-						unique = unique .. "."
-					until not elevators:FindFirstChild(unique)
-					model.Name = unique
+	local f = workspace:FindFirstChild("Elevators")
+	if f then
+		local n = {}
+		for _, m in ipairs(f:GetChildren()) do
+			if m:IsA("Model") then
+				local o = m.Name
+				if n[o] then
+					local s = o
+					repeat s = s .. "." until not f:FindFirstChild(s)
+					m.Name = s
 				else
-					names[original] = true
+					n[o] = true
 				end
 			end
 		end
@@ -153,19 +146,24 @@ if game.PlaceId == 117452115137842 then
 	frame.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
 	frame.BorderSizePixel = 0
 	frame.BackgroundTransparency = 1
+	frame.ZIndex = 2
 	frame.Parent = gui
 	createUICorner(frame, 12)
+	createShadow(frame)
+
+	TweenService:Create(frame, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
 
 	local title = Instance.new("TextLabel")
 	title.Size = UDim2.new(1, 0, 0, 36)
 	title.BackgroundTransparency = 1
 	title.Text = "ElevatorSpammer"
 	title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	title.ZIndex = 3
 	setFont(title)
 	title.TextSize = 22
 	title.Parent = frame
 
-	local tb1 = createTextbox("Amount of People(any amount)", 46, frame)
+	local tb1 = createTextbox("Amount of People", 46, frame)
 
 	local btn2
 	local function toggleBtn2()
@@ -173,14 +171,14 @@ if game.PlaceId == 117452115137842 then
 	end
 
 	btn2 = createButton("Let people in", 86, frame, toggleBtn2)
-	local tb3 = createTextbox("Mode(can be put as anything)", 126, frame)
-	local tb4 = createTextbox("Map(can be put as anything)", 166, frame)
+
+	local tb3 = createTextbox("Mode", 126, frame)
+	local tb4 = createTextbox("Map", 166, frame)
 
 	local spamming = false
 	local spamThread
-	local btn
 
-	btn = createButton("Spam", 210, frame, function()
+	local btn = createButton("Spam", 210, frame, function()
 		if spamming then
 			spamming = false
 			btn.Text = "Spam"
@@ -237,11 +235,8 @@ if game.PlaceId == 117452115137842 then
 
 	UserInputService.InputChanged:Connect(function(i)
 		if i == input and dragging then
-			local delta = i.Position - start
-			frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + delta.X, offset.Y.Scale, offset.Y.Offset + delta.Y)
+			local d = i.Position - start
+			frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)
 		end
 	end)
-
-	-- fade in
-	TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
 end
