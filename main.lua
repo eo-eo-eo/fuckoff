@@ -3,6 +3,7 @@ if game.PlaceId ~= 117452115137842 and game.PlaceId ~= 83363871432855 then retur
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
 local player = Players.LocalPlayer
 
 local function createUICorner(parent, radius)
@@ -36,7 +37,7 @@ if game.PlaceId == 83363871432855 then
     local gui2 = Instance.new("ScreenGui")
     gui2.Name = "TowerPlacerUI"
     gui2.ResetOnSpawn = false
-    gui2.Parent = player:WaitForChild("PlayerGui")
+    gui2.Parent = CoreGui
 
     local frame2 = Instance.new("Frame")
     frame2.Size = UDim2.fromOffset(260, 150)
