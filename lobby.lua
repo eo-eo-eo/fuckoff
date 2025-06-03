@@ -33,7 +33,7 @@ end
 
 local function createButton(text, y, parent, action)
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(1, -30, 0, 30)
+    b.Size = UDim2.new(1, -30, 0, 30) -- same size as textbox
     b.Position = UDim2.new(0, 15, 0, y)
     b.Text = text
     b.TextColor3 = Color3.new(1, 1, 1)
@@ -72,12 +72,11 @@ if game.PlaceId == 117452115137842 then
 
     local tb1 = createTextbox("Amount of People(any amount)", 46, frame)
     local btn2 = createButton("Let people in", 86, frame, function()
-            if btn2.Text == "Let people in" then
-        btn2.Text = "Don't let people in"
-    else
-        btn2.Text = "Let people in"
-    end
-
+        if btn2.Text == "Let people in" then
+            btn2.Text = "Don't let people in"
+        else
+            btn2.Text = "Let people in"
+        end
     end)
     local tb3 = createTextbox("Mode(can be put as anything)", 126, frame)
     local tb4 = createTextbox("Map(can be put as anything)", 166, frame)
