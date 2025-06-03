@@ -325,26 +325,48 @@ if game.PlaceId == 83363871432855 then
     end)
 
     placeButton.MouseButton1Click:Connect(function()
-    placeButton.Text = "Waiting for click"
-    local conn
-    conn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-        if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local mousePos = UserInputService:GetMouseLocation()
-            local ray = workspace.CurrentCamera:ScreenPointToRay(mousePos.X, mousePos.Y)
-            local raycastParams = RaycastParams.new()
-            raycastParams.FilterDescendantsInstances = {player.Character}
-            raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-            local raycastResult = workspace:Raycast(ray.Origin, ray.Direction * 500, raycastParams)
-            if raycastResult then
-                local name = chooseTower.Text:split("-")[1]:gsub("%s+$", "")
-                local args = {name, CFrame.new(raycastResult.Position)}
-                ReplicatedStorage:WaitForChild("Functions"):WaitForChild("SpawnTower"):InvokeServer(unpack(args))
-                placeButton.Text = "Place"
-                conn:Disconnect()
+        local towerName = chooseTower.Text
+        local towersFolder = ReplicatedStorage:WaitForChild("Towers")
+        local upgradesFolder = towersFolder:WaitForChild("Upgrades")
+
+        local foundModel = towersFolder:FindFirstChild(towerName)
+        if not foundModel then
+            for _, lvl in ipairs(upgradesLevels) do
+                local lvlFolder = upgradesFolder:FindFirstChild(lvl)
+                if lvlFolder then
+                    foundModel = lvlFolder:FindFirstChild(towerName)
+                    if foundModel then break end
+                end
             end
         end
+
+        if foundModel then
+            local id = foundModel:GetAttribute("ID") or 0
+            ReplicatedStorage:WaitForChild("PlaceTower"):InvokeServer(id, false)
+        end
     end)
-end)
+
+    placeButton.MouseButton1Click:Connect(function()
+        placeButton.Text = "Click where you want to place(or click this again to place another one)"
+        local conn
+        conn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local mousePos = UserInputService:GetMouseLocation()
+                local ray = workspace.CurrentCamera:ScreenPointToRay(mousePos.X, mousePos.Y)
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterDescendantsInstances = {player.Character}
+                raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+                local raycastResult = workspace:Raycast(ray.Origin, ray.Direction * 500, raycastParams)
+                if raycastResult then
+                    local name = chooseTower.Text:split("-")[1]:gsub("%s+$", "")
+                    local args = {name, CFrame.new(raycastResult.Position)}
+                    ReplicatedStorage:WaitForChild("Functions"):WaitForChild("SpawnTower"):InvokeServer(unpack(args))
+                    placeButton.Text = "Place"
+                    conn:Disconnect()
+                end
+            end
+        end)
+    end)
 
 
     local dragging, input, start, offset
