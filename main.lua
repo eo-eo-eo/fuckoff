@@ -29,8 +29,7 @@ local function createButton(text, y, parent, action)
 end
 
 if game.PlaceId == 117452115137842 then
-    -- (Your existing AddCorrupted UI code remains unchanged)
-    -- ...
+    -- Your existing AddCorrupted UI code here
 end
 
 if game.PlaceId == 83363871432855 then
@@ -160,10 +159,12 @@ if game.PlaceId == 83363871432855 then
         end
 
         if foundModel then
-            local id = foundModel:GetAttribute("ID") or 0
-            local headCFrame = player.Character and player.Character:FindFirstChild("Head") and player.Character.Head.CFrame
-            if headCFrame then
-                ReplicatedStorage:WaitForChild("PlaceTower"):InvokeServer(id, headCFrame)
+            local args = {
+                foundModel.Name,
+                player.Character and player.Character:FindFirstChild("Head") and player.Character.Head.CFrame
+            }
+            if args[2] then
+                ReplicatedStorage:WaitForChild("Functions"):WaitForChild("SpawnTower"):InvokeServer(unpack(args))
             end
         end
     end)
