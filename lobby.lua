@@ -45,22 +45,27 @@ local function pulseOnHover(button)
 	end)
 end
 
+local rippleHue = 0
 local function rippleEffect(button)
 	button.ClipsDescendants = true
 	button.MouseButton1Click:Connect(function()
+		rippleHue = (rippleHue + 60) % 360
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
 		ripple.BackgroundTransparency = 0.5
-		ripple.BackgroundColor3 = Color3.fromHSV(globalHue / 360, 1, 1)
+		ripple.BackgroundColor3 = Color3.fromHSV(rippleHue / 360, 1, 1)
 		ripple.Position = UDim2.new(0, button.AbsoluteSize.X / 2, 0, button.AbsoluteSize.Y / 2)
 		ripple.AnchorPoint = Vector2.new(0.5, 0.5)
 		ripple.Parent = button
 		createUICorner(ripple, 999)
-		TweenService:Create(ripple, TweenInfo.new(0.6), {
+		local tween = TweenService:Create(ripple, TweenInfo.new(0.6), {
 			Size = UDim2.new(3, 0, 3, 0),
 			BackgroundTransparency = 1
-		}):Play()
-		game.Debris:AddItem(ripple, 0.7)
+		})
+		tween:Play()
+		tween.Completed:Connect(function()
+			ripple:Destroy()
+		end)
 	end)
 end
 
@@ -107,8 +112,8 @@ local function createButton(text, y, parent, action)
 	createShadow(b)
 	setFont(b)
 	b.TextSize = 18
-	b.MouseButton1Click:Connect(action)
 	rippleEffect(b)
+	b.MouseButton1Click:Connect(action)
 	return b
 end
 
@@ -157,7 +162,7 @@ if game.PlaceId == 117452115137842 then
 	title.Size = UDim2.new(1, 0, 0, 36)
 	title.BackgroundTransparency = 1
 	title.Text = "ElevatorSpammer"
-	title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	title.TextColor3 = Color3.fromHSV(0, 1, 1)
 	title.ZIndex = 3
 	setFont(title)
 	title.TextSize = 22
@@ -222,7 +227,7 @@ if game.PlaceId == 117452115137842 then
 			local ripple = Instance.new("Frame")
 			ripple.Size = UDim2.new(0, 0, 0, 0)
 			ripple.BackgroundTransparency = 0.5
-			ripple.BackgroundColor3 = Color3.fromHSV(globalHue / 360, 1, 1)
+			ripple.BackgroundColor3 = Color3.fromHSV((globalHue + 120) / 360, 1, 1)
 			ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
 			ripple.AnchorPoint = Vector2.new(0.5, 0.5)
 			ripple.Parent = frame
@@ -264,10 +269,11 @@ if game.PlaceId == 117452115137842 then
 
 		for _, child in ipairs(frame:GetChildren()) do
 			if child:IsA("TextButton") or child:IsA("TextBox") then
-				child.TextColor3 = color
+				if child ~= btn then
+					child.TextColor3 = color
+				end
 			end
 		end
-
 		btn.TextColor3 = color
 	end)
 end
