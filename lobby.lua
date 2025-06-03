@@ -53,12 +53,10 @@ local function rippleEffect(button)
 		ripple.AnchorPoint = Vector2.new(0.5, 0.5)
 		ripple.Parent = button
 		createUICorner(ripple, 999)
-
 		TweenService:Create(ripple, TweenInfo.new(0.5), {
 			Size = UDim2.new(1.5, 0, 4, 0),
 			BackgroundTransparency = 1
 		}):Play()
-
 		game.Debris:AddItem(ripple, 0.6)
 	end)
 end
@@ -78,21 +76,18 @@ local function createTextbox(placeholder, y, parent)
 	setFont(tb)
 	tb.TextSize = 18
 	pulseOnHover(tb)
-
 	tb.Focused:Connect(function()
 		if tb.Text == placeholder then
 			tb.Text = ""
 			tb.TextColor3 = Color3.new(1, 1, 1)
 		end
 	end)
-
 	tb.FocusLost:Connect(function()
 		if tb.Text == "" then
 			tb.Text = placeholder
 			tb.TextColor3 = Color3.fromRGB(180, 180, 180)
 		end
 	end)
-
 	return tb
 end
 
@@ -114,29 +109,6 @@ local function createButton(text, y, parent, action)
 	pulseOnHover(b)
 	rippleEffect(b)
 	return b
-end
-
-local function createSmoothShapeAnimation(frame)
-	local targetCorners = {
-		UDim.new(0, 30),
-		UDim.new(0, 60),
-		UDim.new(0, 30),
-		UDim.new(0, 12),
-	}
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = targetCorners[1]
-	corner.Parent = frame
-
-	local index = 1
-	task.spawn(function()
-		while frame and frame.Parent do
-			local nextIndex = (index % #targetCorners) + 1
-			local tween = TweenService:Create(corner, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {CornerRadius = targetCorners[nextIndex]})
-			tween:Play()
-			tween.Completed:Wait()
-			index = nextIndex
-		end
-	end)
 end
 
 if game.PlaceId == 117452115137842 then
@@ -173,8 +145,6 @@ if game.PlaceId == 117452115137842 then
 	frame.Parent = gui
 	createUICorner(frame, 12)
 	createShadow(frame)
-
-	createSmoothShapeAnimation(frame)
 
 	TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
 
@@ -213,10 +183,8 @@ if game.PlaceId == 117452115137842 then
 			end
 			return
 		end
-
 		spamming = true
 		btn.Text = "Stop Spam"
-
 		spamThread = task.spawn(function()
 			local val1 = tb1.Text
 			local val2 = (btn2.Text == "Don't let people in")
@@ -224,7 +192,6 @@ if game.PlaceId == 117452115137842 then
 			local val4 = tb4.Text
 			local elevatorsFolder = workspace:FindFirstChild("Elevators")
 			if not elevatorsFolder then return end
-
 			while spamming do
 				for _, elevatorModel in ipairs(elevatorsFolder:GetChildren()) do
 					if elevatorModel:IsA("Model") then
@@ -238,42 +205,18 @@ if game.PlaceId == 117452115137842 then
 		end)
 	end)
 
-	local dragging, input, start, offset
-	local function bounceTween(obj)
-		local info = TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-		local goal1 = {Position = obj.Position + UDim2.new(0, 10, 0, 10)}
-		local goal2 = {Position = obj.Position}
-		local tween1 = TweenService:Create(obj, info, goal1)
-		local tween2 = TweenService:Create(obj, info, goal2)
-		tween1:Play()
-		tween1.Completed:Wait()
-		tween2:Play()
-	end
-
 	frame.InputBegan:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseButton1 then
-			dragging = true
-			start = i.Position
-			offset = frame.Position
-			i.Changed:Connect(function()
-				if i.UserInputState == Enum.UserInputState.End then
-					dragging = false
-					bounceTween(frame)
-				end
-			end)
-		end
-	end)
-
-	frame.InputChanged:Connect(function(i)
-		if i.UserInputType == Enum.UserInputType.MouseMovement then
-			input = i
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function(i)
-		if i == input and dragging then
-			local d = i.Position - start
-			frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)
+			local originalPos = frame.Position
+			local tweenOut = TweenService:Create(frame, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+				Position = originalPos + UDim2.new(0, 10, 0, 10)
+			})
+			local tweenIn = TweenService:Create(frame, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+				Position = originalPos
+			})
+			tweenOut:Play()
+			tweenOut.Completed:Wait()
+			tweenIn:Play()
 		end
 	end)
 end
