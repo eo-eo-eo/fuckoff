@@ -66,18 +66,18 @@ local function createButton(text, y, parent, action)
 end
 
 if game.PlaceId == 117452115137842 then
-    local f=workspace:FindFirstChild("Elevators")
+    local f = workspace:FindFirstChild("Elevators")
     if f then
-        local n={}
-        for _,m in ipairs(f:GetChildren()) do
+        local n = {}
+        for _, m in ipairs(f:GetChildren()) do
             if m:IsA("Model") then
-                local o=m.Name
+                local o = m.Name
                 if n[o] then
-                    local s=o
-                    repeat s=s.."." until not f:FindFirstChild(s)
-                    m.Name=s
+                    local s = o
+                    repeat s = s .. "." until not f:FindFirstChild(s)
+                    m.Name = s
                 else
-                    n[o]=true
+                    n[o] = true
                 end
             end
         end
@@ -107,8 +107,7 @@ if game.PlaceId == 117452115137842 then
 
     local tb1 = createTextbox("Amount of People(any amount)", 46, frame)
 
-    local btn2 -- declare before function
-
+    local btn2
     local function toggleBtn2()
         if btn2.Text == "Let people in" then
             btn2.Text = "Don't let people in"
@@ -124,8 +123,9 @@ if game.PlaceId == 117452115137842 then
 
     local spamming = false
     local spamThread
+    local btn
 
-    local btn = createButton("Spam", 210, frame, function()
+    btn = createButton("Spam", 210, frame, function()
         if spamming then
             spamming = false
             btn.Text = "Spam"
@@ -173,11 +173,13 @@ if game.PlaceId == 117452115137842 then
             end)
         end
     end)
+
     frame.InputChanged:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseMovement then
             input = i
         end
     end)
+
     UserInputService.InputChanged:Connect(function(i)
         if i == input and dragging then
             local d = i.Position - start
