@@ -269,7 +269,7 @@ if game.PlaceId == 117452115137842 then
 
 		for _, child in ipairs(frame:GetChildren()) do
 			if child:IsA("TextButton") or child:IsA("TextBox") then
-				if child ~= btn then
+				if child ~= btn then 
 					child.TextColor3 = color
 				end
 			end
