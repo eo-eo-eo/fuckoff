@@ -106,7 +106,7 @@ if game.PlaceId == 117452115137842 then
 
         spamThread = task.spawn(function()
             local val1 = tb1.Text
-            local val2 = (btn2.Text == "Don't let people in") -- true if "Don't let people in"
+            local val2 = (btn2.Text == "Don't let people in")
             local val3 = tb3.Text
             local val4 = tb4.Text
             local elevatorsFolder = workspace:FindFirstChild("Elevators")
