@@ -151,7 +151,7 @@ if game.PlaceId == 117452115137842 then
 	createUICorner(frame, 12)
 	createShadow(frame)
 
-	TweenService:Create(frame, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
+	TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
 
 	local title = Instance.new("TextLabel")
 	title.Size = UDim2.new(1, 0, 0, 36)
@@ -214,6 +214,17 @@ if game.PlaceId == 117452115137842 then
 	end)
 
 	local dragging, input, start, offset
+	local function bounceTween(obj)
+		local info = TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+		local goal1 = {Position = obj.Position + UDim2.new(0, 10, 0, 10)}
+		local goal2 = {Position = obj.Position}
+		local tween1 = TweenService:Create(obj, info, goal1)
+		local tween2 = TweenService:Create(obj, info, goal2)
+		tween1:Play()
+		tween1.Completed:Wait()
+		tween2:Play()
+	end
+
 	frame.InputBegan:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = true
@@ -222,6 +233,7 @@ if game.PlaceId == 117452115137842 then
 			i.Changed:Connect(function()
 				if i.UserInputState == Enum.UserInputState.End then
 					dragging = false
+					bounceTween(frame)
 				end
 			end)
 		end
