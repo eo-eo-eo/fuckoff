@@ -23,14 +23,29 @@ local function createTextbox(placeholder, y, parent)
     local tb = Instance.new("TextBox")
     tb.Size = UDim2.new(1, -30, 0, 30)
     tb.Position = UDim2.new(0, 15, 0, y)
-    tb.PlaceholderText = placeholder
-    tb.TextColor3 = Color3.new(1, 1, 1)
+    tb.Text = placeholder
+    tb.TextColor3 = Color3.fromRGB(180, 180, 180)
     tb.BackgroundColor3 = Color3.fromRGB(64, 68, 75)
     tb.BorderSizePixel = 0
     tb.Parent = parent
     createUICorner(tb, 6)
     setFont(tb)
     tb.TextSize = 18
+
+    tb.Focused:Connect(function()
+        if tb.Text == placeholder then
+            tb.Text = ""
+            tb.TextColor3 = Color3.new(1,1,1)
+        end
+    end)
+
+    tb.FocusLost:Connect(function()
+        if tb.Text == "" then
+            tb.Text = placeholder
+            tb.TextColor3 = Color3.fromRGB(180, 180, 180)
+        end
+    end)
+
     return tb
 end
 
