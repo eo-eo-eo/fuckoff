@@ -42,21 +42,38 @@ local function pulseOnHover(button)
 	end)
 end
 
-local function rippleEffect(parent, x, y)
-	local ripple = Instance.new("Frame")
-	ripple.Size = UDim2.new(0, 0, 0, 0)
-	ripple.BackgroundTransparency = 0.5
-	ripple.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-	ripple.Position = UDim2.new(0, x, 0, y)
-	ripple.AnchorPoint = Vector2.new(0.5, 0.5)
-	ripple.ClipsDescendants = true
-	createUICorner(ripple, 999)
-	ripple.Parent = parent
-	TweenService:Create(ripple, TweenInfo.new(0.5), {
-		Size = UDim2.new(1.5, 0, 4, 0),
-		BackgroundTransparency = 1
-	}):Play()
-	game.Debris:AddItem(ripple, 0.6)
+local function rainbowPulse(obj)
+	local hue = 0
+	local conn
+	conn = game:GetService("RunService").RenderStepped:Connect(function()
+		hue = (hue + 1) % 360
+		obj.TextColor3 = Color3.fromHSV(hue/360, 1, 1)
+	end)
+	obj.MouseLeave:Connect(function()
+		conn:Disconnect()
+		TweenService:Create(obj, TweenInfo.new(0.2), {TextColor3 = Color3.new(1,1,1)}):Play()
+	end)
+end
+
+local function rippleEffect(button)
+	button.ClipsDescendants = true
+	button.MouseButton1Click:Connect(function()
+		local ripple = Instance.new("Frame")
+		ripple.Size = UDim2.new(0, 0, 0, 0)
+		ripple.BackgroundTransparency = 0.5
+		ripple.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+		ripple.Position = UDim2.new(0, button.AbsoluteSize.X/2, 0, button.AbsoluteSize.Y/2)
+		ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+		ripple.Parent = button
+		createUICorner(ripple, 999)
+
+		TweenService:Create(ripple, TweenInfo.new(0.5), {
+			Size = UDim2.new(2, 0, 2, 0),
+			BackgroundTransparency = 1
+		}):Play()
+
+		game.Debris:AddItem(ripple, 0.6)
+	end)
 end
 
 local function createTextbox(placeholder, y, parent)
@@ -73,19 +90,23 @@ local function createTextbox(placeholder, y, parent)
 	createShadow(tb)
 	setFont(tb)
 	tb.TextSize = 18
-	pulseOnHover(tb)
+	rainbowPulse(tb)
+
 	tb.Focused:Connect(function()
 		if tb.Text == placeholder then
 			tb.Text = ""
 			tb.TextColor3 = Color3.new(1, 1, 1)
 		end
 	end)
+
 	tb.FocusLost:Connect(function()
 		if tb.Text == "" then
 			tb.Text = placeholder
 			tb.TextColor3 = Color3.fromRGB(180, 180, 180)
+			tb.MouseLeave:Wait()
 		end
 	end)
+
 	return tb
 end
 
@@ -104,10 +125,8 @@ local function createButton(text, y, parent, action)
 	setFont(b)
 	b.TextSize = 18
 	b.MouseButton1Click:Connect(action)
-	pulseOnHover(b)
-	b.MouseButton1Click:Connect(function(x, y)
-		rippleEffect(b, x - b.AbsolutePosition.X, y - b.AbsolutePosition.Y)
-	end)
+	rainbowPulse(b)
+	rippleEffect(b)
 	return b
 end
 
@@ -156,6 +175,7 @@ if game.PlaceId == 117452115137842 then
 	title.ZIndex = 3
 	setFont(title)
 	title.TextSize = 22
+	rainbowPulse(title)
 	title.Parent = frame
 
 	local tb1 = createTextbox("Amount of People", 46, frame)
@@ -183,8 +203,10 @@ if game.PlaceId == 117452115137842 then
 			end
 			return
 		end
+
 		spamming = true
 		btn.Text = "Stop Spam"
+
 		spamThread = task.spawn(function()
 			local val1 = tb1.Text
 			local val2 = (btn2.Text == "Don't let people in")
@@ -192,6 +214,7 @@ if game.PlaceId == 117452115137842 then
 			local val4 = tb4.Text
 			local elevatorsFolder = workspace:FindFirstChild("Elevators")
 			if not elevatorsFolder then return end
+
 			while spamming do
 				for _, elevatorModel in ipairs(elevatorsFolder:GetChildren()) do
 					if elevatorModel:IsA("Model") then
@@ -206,12 +229,29 @@ if game.PlaceId == 117452115137842 then
 	end)
 
 	local dragging, input, start, offset
+
 	frame.InputBegan:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = true
 			start = i.Position
 			offset = frame.Position
-			rippleEffect(frame, i.Position.X - frame.AbsolutePosition.X, i.Position.Y - frame.AbsolutePosition.Y)
+
+			local ripple = Instance.new("Frame")
+			ripple.Size = UDim2.new(0, 0, 0, 0)
+			ripple.BackgroundTransparency = 0.5
+			ripple.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+			ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
+			ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+			ripple.Parent = frame
+			createUICorner(ripple, 12)
+
+			TweenService:Create(ripple, TweenInfo.new(0.5), {
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = 1
+			}):Play()
+
+			game.Debris:AddItem(ripple, 0.6)
+
 			i.Changed:Connect(function()
 				if i.UserInputState == Enum.UserInputState.End then
 					dragging = false
