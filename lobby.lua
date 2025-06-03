@@ -10,6 +10,8 @@ local player = Players.LocalPlayer
 
 local remote = ReplicatedStorage:WaitForChild("ApplyElevatorSettings")
 
+local globalHue = 0
+
 local function createUICorner(parent, radius)
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, radius)
@@ -43,37 +45,22 @@ local function pulseOnHover(button)
 	end)
 end
 
-local function rainbowPulse(obj)
-	local hue = 0
-	local conn
-	conn = RunService.RenderStepped:Connect(function()
-		hue = (hue + 3) % 360
-		obj.TextColor3 = Color3.fromHSV(hue / 360, 1, 1)
-	end)
-	return conn
-end
-
 local function rippleEffect(button)
 	button.ClipsDescendants = true
-	local hue = 0
 	button.MouseButton1Click:Connect(function()
-		hue = (hue + 60) % 360
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
 		ripple.BackgroundTransparency = 0.5
-		ripple.BackgroundColor3 = Color3.fromHSV(hue / 360, 1, 1)
+		ripple.BackgroundColor3 = Color3.fromHSV(globalHue / 360, 1, 1)
 		ripple.Position = UDim2.new(0, button.AbsoluteSize.X / 2, 0, button.AbsoluteSize.Y / 2)
 		ripple.AnchorPoint = Vector2.new(0.5, 0.5)
 		ripple.Parent = button
 		createUICorner(ripple, 999)
-		local tween = TweenService:Create(ripple, TweenInfo.new(0.6), {
+		TweenService:Create(ripple, TweenInfo.new(0.6), {
 			Size = UDim2.new(3, 0, 3, 0),
 			BackgroundTransparency = 1
-		})
-		tween:Play()
-		tween.Completed:Connect(function()
-			ripple:Destroy()
-		end)
+		}):Play()
+		game.Debris:AddItem(ripple, 0.7)
 	end)
 end
 
@@ -91,7 +78,6 @@ local function createTextbox(placeholder, y, parent)
 	createShadow(tb)
 	setFont(tb)
 	tb.TextSize = 18
-	rainbowPulse(tb)
 	tb.Focused:Connect(function()
 		if tb.Text == placeholder then
 			tb.Text = ""
@@ -122,7 +108,6 @@ local function createButton(text, y, parent, action)
 	setFont(b)
 	b.TextSize = 18
 	b.MouseButton1Click:Connect(action)
-	rainbowPulse(b)
 	rippleEffect(b)
 	return b
 end
@@ -168,14 +153,6 @@ if game.PlaceId == 117452115137842 then
 	glow.Thickness = 4
 	glow.Parent = frame
 
-	local hue = 0
-	RunService.RenderStepped:Connect(function()
-		hue = (hue + 1) % 360
-		glow.Color = Color3.fromHSV(hue / 360, 1, 1)
-	end)
-
-	TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
-
 	local title = Instance.new("TextLabel")
 	title.Size = UDim2.new(1, 0, 0, 36)
 	title.BackgroundTransparency = 1
@@ -184,16 +161,13 @@ if game.PlaceId == 117452115137842 then
 	title.ZIndex = 3
 	setFont(title)
 	title.TextSize = 22
-	rainbowPulse(title)
 	title.Parent = frame
 
 	local tb1 = createTextbox("Amount of People", 46, frame)
-
 	local btn2
 	local function toggleBtn2()
 		btn2.Text = (btn2.Text == "Let people in") and "Don't let people in" or "Let people in"
 	end
-
 	btn2 = createButton("Let people in", 86, frame, toggleBtn2)
 
 	local tb3 = createTextbox("Mode", 126, frame)
@@ -248,7 +222,7 @@ if game.PlaceId == 117452115137842 then
 			local ripple = Instance.new("Frame")
 			ripple.Size = UDim2.new(0, 0, 0, 0)
 			ripple.BackgroundTransparency = 0.5
-			ripple.BackgroundColor3 = Color3.fromHSV((hue + 120) / 360, 1, 1)
+			ripple.BackgroundColor3 = Color3.fromHSV(globalHue / 360, 1, 1)
 			ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
 			ripple.AnchorPoint = Vector2.new(0.5, 0.5)
 			ripple.Parent = frame
@@ -280,5 +254,20 @@ if game.PlaceId == 117452115137842 then
 			local d = i.Position - start
 			frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)
 		end
+	end)
+
+	RunService.RenderStepped:Connect(function()
+		globalHue = (globalHue + 1) % 360
+		local color = Color3.fromHSV(globalHue / 360, 1, 1)
+		glow.Color = color
+		title.TextColor3 = color
+
+		for _, child in ipairs(frame:GetChildren()) do
+			if child:IsA("TextButton") or child:IsA("TextBox") then
+				child.TextColor3 = color
+			end
+		end
+
+		btn.TextColor3 = color
 	end)
 end
