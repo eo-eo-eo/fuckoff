@@ -368,7 +368,7 @@ end)
     UserInputService.InputChanged:Connect(function(i)
         if i == input and dragging then
             local d = i.Position - start
-            frame2.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)More actions
+            frame2.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)
         end
     end)
 end
