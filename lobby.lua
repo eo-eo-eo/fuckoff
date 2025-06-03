@@ -72,7 +72,12 @@ if game.PlaceId == 117452115137842 then
 
     local tb1 = createTextbox("Amount of People(any amount)", 46, frame)
     local btn2 = createButton("Let people in", 86, frame, function()
-        print("Button 2 clicked, current tb1 text:", tb1.Text)
+            if btn2.Text == "Let people in" then
+        btn2.Text = "Don't let people in"
+    else
+        btn2.Text = "Let people in"
+    end
+
     end)
     local tb3 = createTextbox("Mode(can be put as anything)", 126, frame)
     local tb4 = createTextbox("Map(can be put as anything)", 166, frame)
