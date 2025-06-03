@@ -47,34 +47,33 @@ local function rainbowPulse(obj)
 	local hue = 0
 	local conn
 	conn = RunService.RenderStepped:Connect(function()
-		hue = (hue + 1) % 360
+		hue = (hue + 3) % 360
 		obj.TextColor3 = Color3.fromHSV(hue / 360, 1, 1)
-	end)
-	obj.MouseLeave:Connect(function()
-		-- do nothing on leave, keep rainbow
-	end)
-	obj.MouseEnter:Connect(function()
-		-- keep rainbow on hover
 	end)
 	return conn
 end
 
 local function rippleEffect(button)
 	button.ClipsDescendants = true
+	local hue = 0
 	button.MouseButton1Click:Connect(function()
+		hue = (hue + 60) % 360
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
 		ripple.BackgroundTransparency = 0.5
-		ripple.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+		ripple.BackgroundColor3 = Color3.fromHSV(hue / 360, 1, 1)
 		ripple.Position = UDim2.new(0, button.AbsoluteSize.X / 2, 0, button.AbsoluteSize.Y / 2)
 		ripple.AnchorPoint = Vector2.new(0.5, 0.5)
 		ripple.Parent = button
 		createUICorner(ripple, 999)
-		TweenService:Create(ripple, TweenInfo.new(0.6), {
+		local tween = TweenService:Create(ripple, TweenInfo.new(0.6), {
 			Size = UDim2.new(3, 0, 3, 0),
 			BackgroundTransparency = 1
-		}):Play()
-		game.Debris:AddItem(ripple, 0.7)
+		})
+		tween:Play()
+		tween.Completed:Connect(function()
+			ripple:Destroy()
+		end)
 	end)
 end
 
@@ -249,7 +248,7 @@ if game.PlaceId == 117452115137842 then
 			local ripple = Instance.new("Frame")
 			ripple.Size = UDim2.new(0, 0, 0, 0)
 			ripple.BackgroundTransparency = 0.5
-			ripple.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+			ripple.BackgroundColor3 = Color3.fromHSV((hue + 120) / 360, 1, 1)
 			ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
 			ripple.AnchorPoint = Vector2.new(0.5, 0.5)
 			ripple.Parent = frame
