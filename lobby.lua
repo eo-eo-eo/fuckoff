@@ -260,77 +260,148 @@ if game.PlaceId == 117452115137842 then
     end)
 
 elseif game.PlaceId == 83363871432855 then
-    local remote = ReplicatedStorage:WaitForChild("ApplyElevatorSettings")
+    local gui2 = Instance.new("ScreenGui")
+    gui2.Name = "TowerPlacerUI"
+    gui2.ResetOnSpawn = false
+    gui2.Parent = CoreGui
 
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "ElevatorSpammerUI2"
-    gui.ResetOnSpawn = false
-    gui.IgnoreGuiInset = true
-    gui.Parent = CoreGui
+    local frame2 = Instance.new("Frame")
+    frame2.Size = UDim2.fromOffset(260, 150)
+    frame2.Position = UDim2.new(0.5, -130, 0.5, -75)
+    frame2.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
+    frame2.BorderSizePixel = 0
+    frame2.Parent = gui2
+    createUICorner(frame2, 12)
 
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.fromOffset(300, 220)
-    frame.Position = UDim2.new(0.5, -150, 0.5, -110)
-    frame.BackgroundColor3 = Color3.fromRGB(25, 27, 29)
-    frame.BorderSizePixel = 0
-    frame.BackgroundTransparency = 1
-    frame.ZIndex = 2
-    frame.Parent = gui
-    createUICorner(frame, 12)
-    createShadow(frame)
+    local title2 = Instance.new("TextLabel")
+    title2.Size = UDim2.new(1, 0, 0, 36)
+    title2.BackgroundTransparency = 1
+    title2.Text = "Tower placer"
+    title2.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title2.Font = Enum.Font.SourceSansSemibold
+    title2.TextSize = 22
+    title2.Parent = frame2
 
-    local glow = Instance.new("UIStroke")
-    glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    glow.Color = Color3.fromHSV(0, 1, 1)
-    glow.Thickness = 4
-    glow.Parent = frame
+    local chooseTower = createButton("Choose Tower", 46, frame2, function() end)
+    local placeButton = createButton("Place", 90, frame2, function() end)
 
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 36)
-    title.BackgroundTransparency = 1
-    title.Text = "ElevatorSpammer"
-    title.TextColor3 = Color3.fromHSV(0, 1, 1)
-    title.ZIndex = 3
-    setFont(title)
-    title.TextSize = 22
-    title.Parent = frame
+    local dropdownFrame = Instance.new("Frame")
+    dropdownFrame.Size = UDim2.new(1, -30, 0, 0)
+    dropdownFrame.Position = UDim2.new(0, 15, 0, 80)
+    dropdownFrame.BackgroundColor3 = Color3.fromRGB(47, 49, 54)
+    dropdownFrame.BorderSizePixel = 0
+    dropdownFrame.ClipsDescendants = true
+    dropdownFrame.Parent = frame2
+    createUICorner(dropdownFrame, 8)
 
-    local tb1 = createTextbox("Amount of People", 46, frame)
-    local tb3 = createTextbox("Mode", 86, frame)
-    local tb4 = createTextbox("Map", 126, frame)
+    local scrollFrame = Instance.new("ScrollingFrame")
+    scrollFrame.Size = UDim2.new(1, 0, 1, 0)
+    scrollFrame.BackgroundTransparency = 1
+    scrollFrame.BorderSizePixel = 0
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scrollFrame.Parent = dropdownFrame
+    scrollFrame.ScrollBarThickness = 6
 
-    local spamming = false
-    local spamThread
+    local uiListLayout = Instance.new("UIListLayout")
+    uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    uiListLayout.Parent = scrollFrame
+    uiListLayout.Padding = UDim.new(0, 4)
 
-    local btn = createButton("Spam", 166, frame, function()
-        if spamming then
-            spamming = false
-            btn.Text = "Spam"
-            if spamThread then
-                task.cancel(spamThread)
-                spamThread = nil
-            end
-            return
+    local expanded = false
+    local towersList = {}
+
+    local searchFolders = {
+        ReplicatedStorage:WaitForChild("Towers"),
+        ReplicatedStorage.Towers:WaitForChild("Skins"),
+        ReplicatedStorage.Towers.Upgrades:WaitForChild("Lv2"),
+        ReplicatedStorage.Towers.Upgrades:WaitForChild("Lv3"),
+        ReplicatedStorage.Towers.Upgrades:WaitForChild("Lv4"),
+        ReplicatedStorage:WaitForChild("Projectiles"),
+        ReplicatedStorage:WaitForChild("Bin"),
+    }
+
+    local function refreshTowers()
+        for _, v in pairs(scrollFrame:GetChildren()) do
+            if v:IsA("TextButton") then v:Destroy() end
         end
 
-        spamming = true
-        btn.Text = "Stop Spam"
+        towersList = {}
 
-        spamThread = task.spawn(function()
-            while spamming do
-                remote:FireServer(tb1.Text, false, tb3.Text, tb4.Text, workspace.Elevators["Elevator 2.0"])
-                task.wait()
+        for _, folder in ipairs(searchFolders) do
+            for _, model in ipairs(folder:GetChildren()) do
+                if model:IsA("Model") then
+                    local priceValue = 0
+                    local config = model:FindFirstChild("Config")
+                    if config then
+                        local price = config:FindFirstChild("Price")
+                        if price and price:IsA("IntValue") then
+                            priceValue = price.Value
+                        end
+                    end
+                    table.insert(towersList, model.Name .. " - " .. priceValue .. "G")
+                end
             end
-        end)
+        end
+
+        for i, towerDisplayName in ipairs(towersList) do
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1, 0, 0, 28)
+            btn.BackgroundColor3 = Color3.fromRGB(64, 68, 75)
+            btn.BorderSizePixel = 0
+            btn.Font = Enum.Font.SourceSansSemibold
+            btn.TextSize = 16
+            btn.TextColor3 = Color3.new(1, 1, 1)
+            btn.Text = towerDisplayName
+            btn.LayoutOrder = i
+            btn.Parent = scrollFrame
+            createUICorner(btn, 6)
+            btn.MouseButton1Click:Connect(function()
+                chooseTower.Text = towerDisplayName
+                expanded = false
+                dropdownFrame:TweenSize(UDim2.new(1, -30, 0, 0), "Out", "Quart", 0.3, true)
+            end)
+        end
+
+        wait()
+        scrollFrame.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y)
+    end
+
+    chooseTower.MouseButton1Click:Connect(function()
+        expanded = not expanded
+        if expanded then
+            refreshTowers()
+            dropdownFrame:TweenSize(UDim2.new(1, -30, 0, 150), "Out", "Quart", 0.3, true)
+        else
+            dropdownFrame:TweenSize(UDim2.new(1, -30, 0, 0), "Out", "Quart", 0.3, true)
+        end
+    end)
+
+    placeButton.MouseButton1Click:Connect(function()
+        local towerName = chooseTower.Text:match("^(.-) %-") or ""
+        local foundModel
+
+        for _, folder in ipairs(searchFolders) do
+            foundModel = folder:FindFirstChild(towerName)
+            if foundModel then break end
+        end
+
+        if foundModel then
+            local args = {
+                foundModel.Name,
+                player.Character and player.Character:FindFirstChild("Head") and player.Character.Head.CFrame
+            }
+            if args[2] then
+                ReplicatedStorage:WaitForChild("Functions"):WaitForChild("SpawnTower"):InvokeServer(unpack(args))
+            end
+        end
     end)
 
     local dragging, input, start, offset
-
-    frame.InputBegan:Connect(function(i)
+    frame2.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             start = i.Position
-            offset = frame.Position
+            offset = frame2.Position
             i.Changed:Connect(function()
                 if i.UserInputState == Enum.UserInputState.End then
                     dragging = false
@@ -338,22 +409,15 @@ elseif game.PlaceId == 83363871432855 then
             end)
         end
     end)
-
-    frame.InputChanged:Connect(function(i)
+    frame2.InputChanged:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseMovement then
             input = i
         end
     end)
-
-    local globalHue = 0
-    RunService.RenderStepped:Connect(function()
-        if dragging and input then
-            local delta = input.Position - start
-            frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + delta.X, offset.Y.Scale, offset.Y.Offset + delta.Y)
+    UserInputService.InputChanged:Connect(function(i)
+        if i == input and dragging then
+            local d = i.Position - start
+            frame2.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)
         end
-        globalHue = (globalHue + 1) % 360
-        local hsvColor = Color3.fromHSV(globalHue / 360, 1, 1)
-        glow.Color = hsvColor
-        title.TextColor3 = hsvColor
     end)
 end
