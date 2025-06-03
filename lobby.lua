@@ -142,7 +142,7 @@ if game.PlaceId == 117452115137842 then
 	gui.Parent = CoreGui
 
 	local frame = Instance.new("Frame")
-	frame.Size = UDim2.fromOffset(300, 260)
+	frame.Size = UDim2.fromOffset(320, 280)
 	frame.Position = UDim2.new(0.5, -150, 0.5, -130)
 	frame.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
 	frame.BorderSizePixel = 0
@@ -169,9 +169,12 @@ if game.PlaceId == 117452115137842 then
 	title.Parent = frame
 
 	local tb1 = createTextbox("Amount of People", 46, frame)
+
 	local btn2
 	local function toggleBtn2()
-		btn2.Text = (btn2.Text == "Let people in") and "Don't let people in" or "Let people in"
+		if btn2 then
+			btn2.Text = (btn2.Text == "Let people in") and "Don't let people in" or "Let people in"
+		end
 	end
 	btn2 = createButton("Let people in", 86, frame, toggleBtn2)
 
@@ -181,7 +184,8 @@ if game.PlaceId == 117452115137842 then
 	local spamming = false
 	local spamThread
 
-	local btn = createButton("Spam", 210, frame, function()
+	local btn
+	btn = createButton("Spam", 210, frame, function()
 		if spamming then
 			spamming = false
 			btn.Text = "Spam"
@@ -214,6 +218,12 @@ if game.PlaceId == 117452115137842 then
 				task.wait()
 			end
 		end)
+	end)
+
+	createButton("Join endelss(wait ten sec)", 250, frame, function()
+		firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
+		wait(2)
+		game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, Nightmare, Endless, workspace.Elevators["Elevator2.0 (endless mode)"])
 	end)
 
 	local dragging, input, start, offset
