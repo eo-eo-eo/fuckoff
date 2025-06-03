@@ -292,6 +292,7 @@ elseif game.PlaceId == 83363871432855 then
     dropdownFrame.BorderSizePixel = 0
     dropdownFrame.ClipsDescendants = true
     dropdownFrame.Parent = frame2
+    dropdownFrame.ZIndex = placeButton.ZIndex + 1
     createUICorner(dropdownFrame, 8)
 
     local scrollFrame = Instance.new("ScrollingFrame")
