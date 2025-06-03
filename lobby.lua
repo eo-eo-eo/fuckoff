@@ -142,7 +142,7 @@ if game.PlaceId == 117452115137842 then
 	gui.Parent = CoreGui
 
 	local frame = Instance.new("Frame")
-	frame.Size = UDim2.fromOffset(300, 260)
+	frame.Size = UDim2.fromOffset(320, 280)
 	frame.Position = UDim2.new(0.5, -150, 0.5, -130)
 	frame.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
 	frame.BorderSizePixel = 0
