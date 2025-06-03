@@ -224,7 +224,7 @@ if game.PlaceId == 117452115137842 then
 	createButton("Join endelss(wait ten sec)", 250, frame, function()
 	firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
 	wait(2)
-	game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, Nightmare, Endless, workspace.Elevators["Elevator2.0 (endless mode)"])
+	game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, "Nightmare", "Endless", workspace.Elevators["Elevator2.0 (endless mode)"])
         end)
 
 	local dragging, input, start, offset
