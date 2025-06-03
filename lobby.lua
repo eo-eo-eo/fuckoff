@@ -42,23 +42,21 @@ local function pulseOnHover(button)
 	end)
 end
 
-local function rippleEffect(button)
-	button.ClipsDescendants = true
-	button.MouseButton1Click:Connect(function(x, y)
-		local ripple = Instance.new("Frame")
-		ripple.Size = UDim2.new(0, 0, 0, 0)
-		ripple.BackgroundTransparency = 0.5
-		ripple.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-		ripple.Position = UDim2.new(0, x - button.AbsolutePosition.X, 0, y - button.AbsolutePosition.Y)
-		ripple.AnchorPoint = Vector2.new(0.5, 0.5)
-		ripple.Parent = button
-		createUICorner(ripple, 999)
-		TweenService:Create(ripple, TweenInfo.new(0.5), {
-			Size = UDim2.new(1.5, 0, 4, 0),
-			BackgroundTransparency = 1
-		}):Play()
-		game.Debris:AddItem(ripple, 0.6)
-	end)
+local function rippleEffect(parent, x, y)
+	local ripple = Instance.new("Frame")
+	ripple.Size = UDim2.new(0, 0, 0, 0)
+	ripple.BackgroundTransparency = 0.5
+	ripple.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+	ripple.Position = UDim2.new(0, x, 0, y)
+	ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+	ripple.ClipsDescendants = true
+	createUICorner(ripple, 999)
+	ripple.Parent = parent
+	TweenService:Create(ripple, TweenInfo.new(0.5), {
+		Size = UDim2.new(1.5, 0, 4, 0),
+		BackgroundTransparency = 1
+	}):Play()
+	game.Debris:AddItem(ripple, 0.6)
 end
 
 local function createTextbox(placeholder, y, parent)
@@ -107,7 +105,9 @@ local function createButton(text, y, parent, action)
 	b.TextSize = 18
 	b.MouseButton1Click:Connect(action)
 	pulseOnHover(b)
-	rippleEffect(b)
+	b.MouseButton1Click:Connect(function(x, y)
+		rippleEffect(b, x - b.AbsolutePosition.X, y - b.AbsolutePosition.Y)
+	end)
 	return b
 end
 
@@ -205,18 +205,31 @@ if game.PlaceId == 117452115137842 then
 		end)
 	end)
 
+	local dragging, input, start, offset
 	frame.InputBegan:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseButton1 then
-			local originalPos = frame.Position
-			local tweenOut = TweenService:Create(frame, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-				Position = originalPos + UDim2.new(0, 10, 0, 10)
-			})
-			local tweenIn = TweenService:Create(frame, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-				Position = originalPos
-			})
-			tweenOut:Play()
-			tweenOut.Completed:Wait()
-			tweenIn:Play()
+			dragging = true
+			start = i.Position
+			offset = frame.Position
+			rippleEffect(frame, i.Position.X - frame.AbsolutePosition.X, i.Position.Y - frame.AbsolutePosition.Y)
+			i.Changed:Connect(function()
+				if i.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+
+	frame.InputChanged:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseMovement then
+			input = i
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(i)
+		if i == input and dragging then
+			local d = i.Position - start
+			frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)
 		end
 	end)
 end
