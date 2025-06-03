@@ -51,6 +51,7 @@ local function createButton(text, y, parent, action)
 end
 
 if game.PlaceId == 117452115137842 then
+    local f=workspace:FindFirstChild("Elevators")if f then local n={}for _,m in ipairs(f:GetChildren())do if m:IsA("Model")then local o=m.Name if n[o]then local s=o repeat s=s.."."until not f:FindFirstChild(s)m.Name=s else n[o]=true end end end end
     local gui = Instance.new("ScreenGui")
     gui.Name = "ElevatorSpammerUI"
     gui.ResetOnSpawn = false
