@@ -107,7 +107,8 @@ if game.PlaceId == 117452115137842 then
 
     local tb1 = createTextbox("Amount of People(any amount)", 46, frame)
 
-    local btn2
+    local btn2 -- declare before function
+
     local function toggleBtn2()
         if btn2.Text == "Let people in" then
             btn2.Text = "Don't let people in"
@@ -115,6 +116,7 @@ if game.PlaceId == 117452115137842 then
             btn2.Text = "Let people in"
         end
     end
+
     btn2 = createButton("Let people in", 86, frame, toggleBtn2)
 
     local tb3 = createTextbox("Mode(can be put as anything)", 126, frame)
