@@ -161,30 +161,11 @@ if game.PlaceId == 83363871432855 then
 
         if foundModel then
             local id = foundModel:GetAttribute("ID") or 0
-            ReplicatedStorage:WaitForChild("PlaceTower"):InvokeServer(id, false)
-        end
-    end)
-
-    placeButton.MouseButton1Click:Connect(function()
-        placeButton.Text = "Click where you want to place (or click this again to place another one)"
-        local conn
-        conn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-            if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 then
-                local mousePos = UserInputService:GetMouseLocation()
-                local ray = workspace.CurrentCamera:ScreenPointToRay(mousePos.X, mousePos.Y)
-                local raycastParams = RaycastParams.new()
-                raycastParams.FilterDescendantsInstances = {player.Character}
-                raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-                local raycastResult = workspace:Raycast(ray.Origin, ray.Direction * 500, raycastParams)
-                if raycastResult then
-                    local name = chooseTower.Text:match("^(.-) %-") or ""
-                    local args = {name, CFrame.new(raycastResult.Position)}
-                    ReplicatedStorage:WaitForChild("Functions"):WaitForChild("SpawnTower"):InvokeServer(unpack(args))
-                    placeButton.Text = "Place"
-                    conn:Disconnect()
-                end
+            local headCFrame = player.Character and player.Character:FindFirstChild("Head") and player.Character.Head.CFrame
+            if headCFrame then
+                ReplicatedStorage:WaitForChild("PlaceTower"):InvokeServer(id, headCFrame)
             end
-        end)
+        end
     end)
 
     local dragging, input, start, offset
