@@ -221,12 +221,14 @@ if game.PlaceId == 117452115137842 then
 		end)
 	end)
 
-
 	createButton("Join endelss(wait ten sec)", 250, frame, function()
-	firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
-	wait(2)
-	game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, "Nightmare", "Endless", workspace.Elevators["Elevator2.0 (endless mode)"])
-        end)
+		local char = player.Character
+		if char and char:FindFirstChild("HumanoidRootPart") and workspace.Elevators:FindFirstChild("Elevator2.0 (endless mode)") then
+			firetouchinterest(char.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
+		end
+		wait(2)
+		remote:FireServer(1, false, "Nightmare", "Endless", workspace.Elevators["Elevator2.0 (endless mode)"])
+	end)
 
 	local dragging, input, start, offset
 
@@ -288,7 +290,6 @@ if game.PlaceId == 117452115137842 then
 		end
 		btn.TextColor3 = color
 	end)
-end
 elseif game.PlaceId == 83363871432855 then
 	local gui = Instance.new("ScreenGui")
 	gui.Name = "MiniElevatorUI"
@@ -333,58 +334,16 @@ elseif game.PlaceId == 83363871432855 then
 	end)
 	pulseOnHover(btn2)
 
-	-- Make frame draggable
-	local dragging, input, start, offset
-
-	frame.InputBegan:Connect(function(i)
-		if i.UserInputType == Enum.UserInputType.MouseButton1 then
-			dragging = true
-			start = i.Position
-			offset = frame.Position
-
-			local ripple = Instance.new("Frame")
-			ripple.Size = UDim2.new(0, 0, 0, 0)
-			ripple.BackgroundTransparency = 0.5
-			ripple.BackgroundColor3 = Color3.fromHSV((globalHue + 120) / 360, 1, 1)
-			ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
-			ripple.AnchorPoint = Vector2.new(0.5, 0.5)
-			ripple.Parent = frame
-			createUICorner(ripple, 12)
-
-			TweenService:Create(ripple, TweenInfo.new(0.6), {
-				Size = UDim2.new(3, 0, 3, 0),
-				BackgroundTransparency = 1
-			}):Play()
-
-			game.Debris:AddItem(ripple, 0.7)
-
-			i.Changed:Connect(function()
-				if i.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
-			end)
-		end
-	end)
-
-	frame.InputChanged:Connect(function(i)
-		if i.UserInputType == Enum.UserInputType.MouseMovement then
-			input = i
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function(i)
-		if i == input and dragging then
-			local d = i.Position - start
-			frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)
-		end
-	end)
-
 	RunService.RenderStepped:Connect(function()
 		globalHue = (globalHue + 1) % 360
 		local color = Color3.fromHSV(globalHue / 360, 1, 1)
 		glow.Color = color
 		title.TextColor3 = color
-		btn1.TextColor3 = color
-		btn2.TextColor3 = color
+
+		for _, child in ipairs(frame:GetChildren()) do
+			if child:IsA("TextButton") then
+				child.TextColor3 = color
+			end
+		end
 	end)
 end
