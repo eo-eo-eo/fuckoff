@@ -222,10 +222,10 @@ if game.PlaceId == 117452115137842 then
 
 
 	createButton("Join endelss(wait ten sec)", 250, frame, function()
-		firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
-		wait(2)
-		game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, "Nightmare", "Endless", workspace.Elevators["Elevator2.0 (endless mode)"])
-	end)
+	firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
+	wait(2)
+	game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, "Nightmare", "Endless", workspace.Elevators["Elevator2.0 (endless mode)"])
+        end)
 
 	local dragging, input, start, offset
 
@@ -286,57 +286,5 @@ if game.PlaceId == 117452115137842 then
 			end
 		end
 		btn.TextColor3 = color
-	end)
-
-if game.PlaceId == 83363871432855 then end
-	local gui2 = Instance.new("ScreenGui")
-	gui2.Name = "ElevatorMiniUI"
-	gui2.ResetOnSpawn = false
-	gui2.IgnoreGuiInset = true
-	gui2.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui") -- fixed
-
-	local frame2 = Instance.new("Frame")
-	frame2.Size = UDim2.fromOffset(240, 160)
-	frame2.Position = UDim2.new(0.5, -120, 0.5, -80)
-	frame2.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
-	frame2.BackgroundTransparency = 0.3
-	frame2.BorderSizePixel = 0
-	frame2.ZIndex = 2
-	frame2.Parent = gui2
-	createUICorner(frame2, 12)
-	createShadow(frame2)
-
-	local glow2 = Instance.new("UIStroke")
-	glow2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	glow2.Color = Color3.fromHSV(0, 1, 1)
-	glow2.Thickness = 3
-	glow2.Parent = frame2
-
-	local title2 = Instance.new("TextLabel")
-	title2.Size = UDim2.new(1, 0, 0, 36)
-	title2.BackgroundTransparency = 1
-	title2.Text = "ElevatorMini"
-	title2.TextColor3 = Color3.fromHSV(0, 1, 1)
-	title2.ZIndex = 3
-	setFont(title2)
-	title2.TextSize = 20
-	title2.Parent = frame2
-
-	local function placeholderAction() end
-
-	createButton("Action 1", 46, frame2, placeholderAction)
-	createButton("Action 2", 86, frame2, placeholderAction)
-
-	RunService.RenderStepped:Connect(function()
-		globalHue = (globalHue + 1) % 360
-		local color = Color3.fromHSV(globalHue / 360, 1, 1)
-		glow2.Color = color
-		title2.TextColor3 = color
-
-		for _, child in ipairs(frame2:GetChildren()) do
-			if child:IsA("TextButton") then
-				child.TextColor3 = color
-			end
-		end
 	end)
 end
