@@ -288,7 +288,7 @@ if game.PlaceId == 117452115137842 then
 		btn.TextColor3 = color
 	end)
 
-if game.PlaceId == 83363871432855 then
+if game.PlaceId == 83363871432855 then end
 	local gui2 = Instance.new("ScreenGui")
 	gui2.Name = "ElevatorMiniUI"
 	gui2.ResetOnSpawn = false
