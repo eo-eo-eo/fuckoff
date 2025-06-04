@@ -288,20 +288,18 @@ if game.PlaceId == 117452115137842 then
 		btn.TextColor3 = color
 	end)
 
-elseif game.PlaceId == 83363871432855 then
-	-- Second GUI with 2 buttons, transparent background, ripple, rainbow text
-
+if game.PlaceId == 83363871432855 then
 	local gui2 = Instance.new("ScreenGui")
-	gui2.Name = "ElevatorSpammerUI2"
+	gui2.Name = "ElevatorMiniUI"
 	gui2.ResetOnSpawn = false
 	gui2.IgnoreGuiInset = true
-	gui2.Parent = CoreGui
+	gui2.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui") -- fixed
 
 	local frame2 = Instance.new("Frame")
-	frame2.Size = UDim2.fromOffset(320, 140)
-	frame2.Position = UDim2.new(0.5, -160, 0.5, -70)
+	frame2.Size = UDim2.fromOffset(240, 160)
+	frame2.Position = UDim2.new(0.5, -120, 0.5, -80)
 	frame2.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
-	frame2.BackgroundTransparency = 0.8
+	frame2.BackgroundTransparency = 0.3
 	frame2.BorderSizePixel = 0
 	frame2.ZIndex = 2
 	frame2.Parent = gui2
@@ -311,78 +309,34 @@ elseif game.PlaceId == 83363871432855 then
 	local glow2 = Instance.new("UIStroke")
 	glow2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	glow2.Color = Color3.fromHSV(0, 1, 1)
-	glow2.Thickness = 4
+	glow2.Thickness = 3
 	glow2.Parent = frame2
 
 	local title2 = Instance.new("TextLabel")
 	title2.Size = UDim2.new(1, 0, 0, 36)
 	title2.BackgroundTransparency = 1
-	title2.Text = "ElevatorSpammer Lite"
+	title2.Text = "ElevatorMini"
 	title2.TextColor3 = Color3.fromHSV(0, 1, 1)
 	title2.ZIndex = 3
 	setFont(title2)
-	title2.TextSize = 22
+	title2.TextSize = 20
 	title2.Parent = frame2
 
-	local btnA = createButton("Button A", 50, frame2, function()
-		print("Button A clicked")
-	end)
+	local function placeholderAction() end
 
-	local btnB = createButton("Button B", 90, frame2, function()
-		print("Button B clicked")
-	end)
-
-	local dragging2, input2, start2, offset2
-
-	frame2.InputBegan:Connect(function(i)
-		if i.UserInputType == Enum.UserInputType.MouseButton1 then
-			dragging2 = true
-			start2 = i.Position
-			offset2 = frame2.Position
-
-			local ripple = Instance.new("Frame")
-			ripple.Size = UDim2.new(0, 0, 0, 0)
-			ripple.BackgroundTransparency = 0.5
-			ripple.BackgroundColor3 = Color3.fromHSV((globalHue + 120) / 360, 1, 1)
-			ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
-			ripple.AnchorPoint = Vector2.new(0.5, 0.5)
-			ripple.Parent = frame2
-			createUICorner(ripple, 12)
-
-			TweenService:Create(ripple, TweenInfo.new(0.6), {
-				Size = UDim2.new(3, 0, 3, 0),
-				BackgroundTransparency = 1
-			}):Play()
-
-			game.Debris:AddItem(ripple, 0.7)
-
-			i.Changed:Connect(function()
-				if i.UserInputState == Enum.UserInputState.End then
-					dragging2 = false
-				end
-			end)
-		end
-	end)
-
-	frame2.InputChanged:Connect(function(i)
-		if i.UserInputType == Enum.UserInputType.MouseMovement then
-			input2 = i
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function(i)
-		if i == input2 and dragging2 then
-			local d = i.Position - start2
-			frame2.Position = UDim2.new(offset2.X.Scale, offset2.X.Offset + d.X, offset2.Y.Scale, offset2.Y.Offset + d.Y)
-		end
-	end)
+	createButton("Action 1", 46, frame2, placeholderAction)
+	createButton("Action 2", 86, frame2, placeholderAction)
 
 	RunService.RenderStepped:Connect(function()
 		globalHue = (globalHue + 1) % 360
 		local color = Color3.fromHSV(globalHue / 360, 1, 1)
 		glow2.Color = color
 		title2.TextColor3 = color
-		btnA.TextColor3 = color
-		btnB.TextColor3 = color
+
+		for _, child in ipairs(frame2:GetChildren()) do
+			if child:IsA("TextButton") then
+				child.TextColor3 = color
+			end
+		end
 	end)
 end
