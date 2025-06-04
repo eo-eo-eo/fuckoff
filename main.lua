@@ -1,3 +1,4 @@
+print("Hi")
 if game.PlaceId ~= 117452115137842 and game.PlaceId ~= 83363871432855 then return end
 
 local Players = game:GetService("Players")
@@ -69,11 +70,6 @@ local function rippleEffect(button)
 	end)
 end
 
-local function applyEffectsToTextButton(button)
-	pulseOnHover(button)
-	rippleEffect(button)
-end
-
 local function createTextbox(placeholder, y, parent)
 	local tb = Instance.new("TextBox")
 	tb.Size = UDim2.new(1, -30, 0, 30)
@@ -117,12 +113,11 @@ local function createButton(text, y, parent, action)
 	createShadow(b)
 	setFont(b)
 	b.TextSize = 18
-	applyEffectsToTextButton(b)
+	rippleEffect(b)
 	b.MouseButton1Click:Connect(action)
 	return b
 end
 
--- ElevatorSpammer GUI for PlaceId 117452115137842
 if game.PlaceId == 117452115137842 then
 	local f = workspace:FindFirstChild("Elevators")
 	if f then
@@ -226,14 +221,15 @@ if game.PlaceId == 117452115137842 then
 		end)
 	end)
 
-	createButton("Join endelss(wait ten sec)", 250, frame, function()
-		firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
-		wait(2)
-		game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, Nightmare, Endless, workspace.Elevators["Elevator2.0 (endless mode)"])
-	end)
 
-	-- Dragging logic
+	createButton("Join endelss(wait ten sec)", 250, frame, function()
+	firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
+	wait(2)
+	game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, "Nightmare", "Endless", workspace.Elevators["Elevator2.0 (endless mode)"])
+        end)
+
 	local dragging, input, start, offset
+
 	frame.InputBegan:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = true
@@ -263,207 +259,132 @@ if game.PlaceId == 117452115137842 then
 			end)
 		end
 	end)
+
 	frame.InputChanged:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseMovement then
 			input = i
 		end
 	end)
+
 	UserInputService.InputChanged:Connect(function(i)
 		if i == input and dragging then
-			local delta = i.Position - start
-			frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + delta.X, offset.Y.Scale, offset.Y.Offset + delta.Y)
+			local d = i.Position - start
+			frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)
 		end
 	end)
 
-	-- Rainbow effect
-	RunService.RenderStepped:Connect(function(dt)
-		globalHue = (globalHue + dt * 0.5) % 1
-		local color = Color3.fromHSV(globalHue, 1, 1)
+	RunService.RenderStepped:Connect(function()
+		globalHue = (globalHue + 1) % 360
+		local color = Color3.fromHSV(globalHue / 360, 1, 1)
 		glow.Color = color
 		title.TextColor3 = color
+
+		for _, child in ipairs(frame:GetChildren()) do
+			if child:IsA("TextButton") or child:IsA("TextBox") then
+				if child ~= btn then
+					child.TextColor3 = color
+				end
+			end
+		end
+		btn.TextColor3 = color
 	end)
 end
+elseif game.PlaceId == 83363871432855 then
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "MiniElevatorUI"
+	gui.ResetOnSpawn = false
+	gui.IgnoreGuiInset = true
+	gui.Parent = CoreGui
 
--- TowerPlacer GUI for PlaceId 83363871432855 with matching effects and rainbow
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.fromOffset(220, 120)
+	frame.Position = UDim2.new(0.5, -110, 0.5, -60)
+	frame.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
+	frame.BorderSizePixel = 0
+	frame.BackgroundTransparency = 1
+	frame.ZIndex = 2
+	frame.Parent = gui
+	createUICorner(frame, 12)
+	createShadow(frame)
 
-if game.PlaceId == 83363871432855 then
-	local gui2 = Instance.new("ScreenGui")
-	gui2.Name = "TowerPlacerUI"
-	gui2.ResetOnSpawn = false
-	gui2.Parent = CoreGui
+	local glow = Instance.new("UIStroke")
+	glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	glow.Color = Color3.fromHSV(0, 1, 1)
+	glow.Thickness = 4
+	glow.Parent = frame
 
-	local frame2 = Instance.new("Frame")
-	frame2.Size = UDim2.fromOffset(260, 150)
-	frame2.Position = UDim2.new(0.5, -130, 0.5, -75)
-	frame2.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
-	frame2.BorderSizePixel = 0
-	frame2.BackgroundTransparency = 1
-	frame2.Parent = gui2
-	createUICorner(frame2, 12)
-	createShadow(frame2)
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1, 0, 0, 36)
+	title.BackgroundTransparency = 1
+	title.Text = "Mini UI"
+	title.TextColor3 = Color3.fromHSV(0, 1, 1)
+	title.ZIndex = 3
+	setFont(title)
+	title.TextSize = 22
+	title.Parent = frame
 
-	local glow2 = Instance.new("UIStroke")
-	glow2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	glow2.Color = Color3.fromHSV(0, 1, 1)
-	glow2.Thickness = 4
-	glow2.Parent = frame2
-
-	local title2 = Instance.new("TextLabel")
-	title2.Size = UDim2.new(1, 0, 0, 36)
-	title2.BackgroundTransparency = 1
-	title2.Text = "Tower placer"
-	title2.TextColor3 = Color3.fromHSV(0, 1, 1)
-	title2.Font = Enum.Font.SourceSansSemibold
-	title2.TextSize = 22
-	title2.ZIndex = 3
-	title2.Parent = frame2
-
-	local chooseTower = createButton("Choose Tower", 46, frame2, function() end)
-	local placeButton = createButton("Place", 90, frame2, function() end)
-
-	local dropdownFrame = Instance.new("Frame")
-	dropdownFrame.Size = UDim2.new(1, -30, 0, 0)
-	dropdownFrame.Position = UDim2.new(0, 15, 0, 80)
-	dropdownFrame.BackgroundColor3 = Color3.fromRGB(47, 49, 54)
-	dropdownFrame.BorderSizePixel = 0
-	dropdownFrame.ClipsDescendants = true
-	dropdownFrame.Parent = frame2
-	createUICorner(dropdownFrame, 8)
-
-	local scrollFrame = Instance.new("ScrollingFrame")
-	scrollFrame.Size = UDim2.new(1, 0, 1, 0)
-	scrollFrame.BackgroundTransparency = 1
-	scrollFrame.BorderSizePixel = 0
-	scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-	scrollFrame.Parent = dropdownFrame
-	scrollFrame.ScrollBarThickness = 6
-
-	local uiListLayout = Instance.new("UIListLayout")
-	uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	uiListLayout.Parent = scrollFrame
-	uiListLayout.Padding = UDim.new(0, 4)
-
-	local expanded = false
-	local towersList = {}
-
-	local searchFolders = {
-		ReplicatedStorage:WaitForChild("Towers"),
-		ReplicatedStorage.Towers:WaitForChild("Skins"),
-		ReplicatedStorage.Towers.Upgrades:WaitForChild("Lv2"),
-		ReplicatedStorage.Towers.Upgrades:WaitForChild("Lv3"),
-		ReplicatedStorage.Towers.Upgrades:WaitForChild("Lv4"),
-		ReplicatedStorage:WaitForChild("Projectiles"),
-		ReplicatedStorage:WaitForChild("Bin"),
-	}
-
-	local function refreshTowers()
-		for _, v in pairs(scrollFrame:GetChildren()) do
-			if v:IsA("TextButton") then v:Destroy() end
-		end
-
-		towersList = {}
-
-		for _, folder in ipairs(searchFolders) do
-			for _, model in ipairs(folder:GetChildren()) do
-				if model:IsA("Model") then
-					local priceValue = 0
-					local config = model:FindFirstChild("Config")
-					if config then
-						local price = config:FindFirstChild("Price")
-						if price and price:IsA("IntValue") then
-							priceValue = price.Value
-						end
-					end
-					table.insert(towersList, model.Name .. " - " .. priceValue .. "G")
-				end
-			end
-		end
-
-		for i, towerDisplayName in ipairs(towersList) do
-			local btn = Instance.new("TextButton")
-			btn.Size = UDim2.new(1, 0, 0, 28)
-			btn.BackgroundColor3 = Color3.fromRGB(64, 68, 75)
-			btn.BorderSizePixel = 0
-			btn.Font = Enum.Font.SourceSansSemibold
-			btn.TextSize = 16
-			btn.TextColor3 = Color3.new(1, 1, 1)
-			btn.Text = towerDisplayName
-			btn.LayoutOrder = i
-			btn.Parent = scrollFrame
-			createUICorner(btn, 6)
-			applyEffectsToTextButton(btn)
-			btn.MouseButton1Click:Connect(function()
-				chooseTower.Text = towerDisplayName
-				expanded = false
-				dropdownFrame:TweenSize(UDim2.new(1, -30, 0, 0), "Out", "Quart", 0.3, true)
-			end)
-		end
-
-		wait()
-		scrollFrame.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y)
-	end
-
-	chooseTower.MouseButton1Click:Connect(function()
-		expanded = not expanded
-		if expanded then
-			refreshTowers()
-			dropdownFrame:TweenSize(UDim2.new(1, -30, 0, 150), "Out", "Quart", 0.3, true)
-		else
-			dropdownFrame:TweenSize(UDim2.new(1, -30, 0, 0), "Out", "Quart", 0.3, true)
-		end
+	local btn1 = createButton("Action 1", 46, frame, function()
+		print("Mini Action 1")
 	end)
+	pulseOnHover(btn1)
 
-	placeButton.MouseButton1Click:Connect(function()
-		local towerName = chooseTower.Text:match("^(.-) %-") or ""
-		local foundModel
-
-		for _, folder in ipairs(searchFolders) do
-			foundModel = folder:FindFirstChild(towerName)
-			if foundModel then break end
-		end
-
-		if foundModel then
-			local args = {
-				foundModel.Name,
-				player.Character and player.Character:FindFirstChild("Head") and player.Character.Head.CFrame
-			}
-			if args[2] then
-				ReplicatedStorage:WaitForChild("Functions"):WaitForChild("SpawnTower"):InvokeServer(unpack(args))
-			end
-		end
+	local btn2 = createButton("Action 2", 86, frame, function()
+		print("Mini Action 2")
 	end)
+	pulseOnHover(btn2)
 
-	local dragging2, input2, start2, offset2
-	frame2.InputBegan:Connect(function(i)
+	-- Make frame draggable
+	local dragging, input, start, offset
+
+	frame.InputBegan:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseButton1 then
-			dragging2 = true
-			start2 = i.Position
-			offset2 = frame2.Position
+			dragging = true
+			start = i.Position
+			offset = frame.Position
+
+			local ripple = Instance.new("Frame")
+			ripple.Size = UDim2.new(0, 0, 0, 0)
+			ripple.BackgroundTransparency = 0.5
+			ripple.BackgroundColor3 = Color3.fromHSV((globalHue + 120) / 360, 1, 1)
+			ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
+			ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+			ripple.Parent = frame
+			createUICorner(ripple, 12)
+
+			TweenService:Create(ripple, TweenInfo.new(0.6), {
+				Size = UDim2.new(3, 0, 3, 0),
+				BackgroundTransparency = 1
+			}):Play()
+
+			game.Debris:AddItem(ripple, 0.7)
+
 			i.Changed:Connect(function()
 				if i.UserInputState == Enum.UserInputState.End then
-					dragging2 = false
+					dragging = false
 				end
 			end)
 		end
 	end)
-	frame2.InputChanged:Connect(function(i)
+
+	frame.InputChanged:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseMovement then
-			input2 = i
-		end
-	end)
-	UserInputService.InputChanged:Connect(function(i)
-		if i == input2 and dragging2 then
-			local d = i.Position - start2
-			frame2.Position = UDim2.new(offset2.X.Scale, offset2.X.Offset + d.X, offset2.Y.Scale, offset2.Y.Offset + d.Y)
+			input = i
 		end
 	end)
 
-	RunService.RenderStepped:Connect(function(dt)
-		globalHue = (globalHue + dt * 0.5) % 1
-		local color = Color3.fromHSV(globalHue, 1, 1)
-		glow2.Color = color
-		title2.TextColor3 = color
-		chooseTower.TextColor3 = color
-		placeButton.TextColor3 = color
+	UserInputService.InputChanged:Connect(function(i)
+		if i == input and dragging then
+			local d = i.Position - start
+			frame.Position = UDim2.new(offset.X.Scale, offset.X.Offset + d.X, offset.Y.Scale, offset.Y.Offset + d.Y)
+		end
+	end)
+
+	RunService.RenderStepped:Connect(function()
+		globalHue = (globalHue + 1) % 360
+		local color = Color3.fromHSV(globalHue / 360, 1, 1)
+		glow.Color = color
+		title.TextColor3 = color
+		btn1.TextColor3 = color
+		btn2.TextColor3 = color
 	end)
 end
