@@ -288,3 +288,54 @@ if game.PlaceId == 117452115137842 then
 		btn.TextColor3 = color
 	end)
 end
+elseif game.PlaceId == 83363871432855 then
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "MiniUI"
+	gui.ResetOnSpawn = false
+	gui.IgnoreGuiInset = true
+	gui.Parent = CoreGui
+
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.fromOffset(220, 120)
+	frame.Position = UDim2.new(0.5, -110, 0.5, -60)
+	frame.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
+	frame.BorderSizePixel = 0
+	frame.BackgroundTransparency = 1
+	frame.ZIndex = 2
+	frame.Parent = gui
+	createUICorner(frame, 12)
+	createShadow(frame)
+
+	local glow = Instance.new("UIStroke")
+	glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	glow.Color = Color3.fromHSV(0, 1, 1)
+	glow.Thickness = 4
+	glow.Parent = frame
+
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1, 0, 0, 36)
+	title.BackgroundTransparency = 1
+	title.Text = "Mini UI"
+	title.TextColor3 = Color3.fromHSV(0, 1, 1)
+	title.ZIndex = 3
+	setFont(title)
+	title.TextSize = 22
+	title.Parent = frame
+
+	local btn1 = createButton("Action 1", 46, frame, function()
+		print("Action 1 triggered")
+	end)
+
+	local btn2 = createButton("Action 2", 86, frame, function()
+		print("Action 2 triggered")
+	end)
+
+	RunService.RenderStepped:Connect(function()
+		globalHue = (globalHue + 1) % 360
+		local color = Color3.fromHSV(globalHue / 360, 1, 1)
+		glow.Color = color
+		title.TextColor3 = color
+		btn1.TextColor3 = color
+		btn2.TextColor3 = color
+	end)
+end
