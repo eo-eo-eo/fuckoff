@@ -70,6 +70,19 @@ local function rippleEffect(button)
 	end)
 end
 
+local function applyGlowAndEffectsToTextBox(tb)
+	local glow = Instance.new("UIStroke")
+	glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	glow.Color = Color3.fromHSV(0, 1, 1)
+	glow.Thickness = 2
+	glow.Parent = tb
+	RunService.RenderStepped:Connect(function()
+		local color = Color3.fromHSV(globalHue / 360, 1, 1)
+		glow.Color = color
+		tb.TextColor3 = color
+	end)
+end
+
 local function createTextbox(placeholder, y, parent)
 	local tb = Instance.new("TextBox")
 	tb.Size = UDim2.new(1, -30, 0, 30)
@@ -96,6 +109,9 @@ local function createTextbox(placeholder, y, parent)
 			tb.TextColor3 = Color3.fromRGB(180, 180, 180)
 		end
 	end)
+
+	applyGlowAndEffectsToTextBox(tb)
+
 	return tb
 end
 
@@ -113,8 +129,10 @@ local function createButton(text, y, parent, action)
 	createShadow(b)
 	setFont(b)
 	b.TextSize = 18
+
 	rippleEffect(b)
-	b.MouseButton1Click:Connect(action)
+	pulseOnHover(b)
+
 	return b
 end
 
@@ -221,12 +239,11 @@ if game.PlaceId == 117452115137842 then
 		end)
 	end)
 
-
 	createButton("Join endelss(wait ten sec)", 250, frame, function()
-	firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
-	wait(2)
-	game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, "Nightmare", "Endless", workspace.Elevators["Elevator2.0 (endless mode)"])
-        end)
+		firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, workspace.Elevators["Elevator2.0 (endless mode)"].Entrance, 0)
+		wait(2)
+		game:GetService("ReplicatedStorage"):WaitForChild("ApplyElevatorSettings"):FireServer(1, false, "Nightmare", "Endless", workspace.Elevators["Elevator2.0 (endless mode)"])
+	end)
 
 	local dragging, input, start, offset
 
@@ -288,7 +305,6 @@ if game.PlaceId == 117452115137842 then
 		end
 		btn.TextColor3 = color
 	end)
-end
 elseif game.PlaceId == 83363871432855 then
 	local gui = Instance.new("ScreenGui")
 	gui.Name = "MiniElevatorUI"
@@ -326,12 +342,14 @@ elseif game.PlaceId == 83363871432855 then
 	local btn1 = createButton("Action 1", 46, frame, function()
 		print("Mini Action 1")
 	end)
-	pulseOnHover(btn1)
-
 	local btn2 = createButton("Action 2", 86, frame, function()
 		print("Mini Action 2")
 	end)
-	pulseOnHover(btn2)
+
+	local buttons = {btn1, btn2}
+	for _, btn in ipairs(buttons) do
+		pulseOnHover(btn)
+	end
 
 	-- Make frame draggable
 	local dragging, input, start, offset
@@ -384,7 +402,11 @@ elseif game.PlaceId == 83363871432855 then
 		local color = Color3.fromHSV(globalHue / 360, 1, 1)
 		glow.Color = color
 		title.TextColor3 = color
-		btn1.TextColor3 = color
-		btn2.TextColor3 = color
+
+		for _, child in ipairs(frame:GetChildren()) do
+			if child:IsA("TextButton") or child:IsA("TextBox") then
+				child.TextColor3 = color
+			end
+		end
 	end)
 end
