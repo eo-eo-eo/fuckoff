@@ -1,3 +1,4 @@
+print("Hi")
 if game.PlaceId ~= 117452115137842 and game.PlaceId ~= 83363871432855 then return end
 
 local Players = game:GetService("Players")
