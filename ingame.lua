@@ -187,6 +187,7 @@ if game.PlaceId == 117452115137842 then
         end
     end)
 end
-elseif game.PlaceId == 83363871432855 then
+if game.PlaceId == 83363871432855 then
     print("hi")
 end
+
